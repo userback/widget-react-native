@@ -1,0 +1,21 @@
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# Dependencies
+node_modules/
+
+# Build output
+lib/
+dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+.DS_Store
