@@ -1,10 +1,16 @@
 {
   "name": "@userback/react-native-sdk",
   "version": "1.0.0",
+  "description": "Userback feedback widget SDK for React Native",
+  "license": "MIT",
+  "keywords": ["userback", "feedback", "react-native", "widget", "sdk"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/userback/react-native-sdk"
+  },
   "workspaces": [
     "examples"
   ],
-  "description": "Userback SDK for React Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -28,10 +34,5 @@
     "react-native-webview": "13.12.5",
     "typescript": "^5.0.0"
   },
-  "packageManager": "yarn@4.13.0",
-  "dependencies": {
-    "expo": "~52.0.49",
-    "react": "18.3.1",
-    "react-native": "0.76.9"
-  }
+  "packageManager": "yarn@4.13.0"
 }
