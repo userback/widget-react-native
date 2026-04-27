@@ -26,6 +26,13 @@ cd ios && pod install
 
 **Android** — no extra steps required; `react-native-webview` is auto-linked via Gradle.
 
+**Expo** — this SDK uses `react-native-webview` which is a native module. Expo Go is not supported. Use a development build:
+
+```sh
+npx expo install expo-dev-client
+npx expo run:ios     # or run:android
+```
+
 ## Setup
 
 Wrap your app's root component with `UserbackProvider`. It renders a transparent WebView overlay that hosts the widget.

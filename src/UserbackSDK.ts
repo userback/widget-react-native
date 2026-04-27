@@ -178,7 +178,6 @@ class UserbackSDKClass extends Emitter {
 
   /** @internal — called by UserbackProvider after capturing the screenshot */
   _sendScreenshot(dataURL: string): void {
-    if (__DEV__) console.log('[Userback] sending screenshot, length:', dataURL.length, 'prefix:', dataURL.slice(0, 64));
     const message = JSON.stringify({
       type: 'native_screenshot',
       payload: { data_url: dataURL },
@@ -191,10 +190,8 @@ class UserbackSDKClass extends Emitter {
     const params = args.map(a => (a === undefined ? 'null' : JSON.stringify(a))).join(', ');
     const js = `(function(){window.Userback&&typeof window.Userback.${fn}==='function'&&window.Userback.${fn}(${params});})();true;`;
     if (this._ready && this._inject) {
-      if (__DEV__) console.log(`[Userback] run: ${fn}(${params})`);
       this._inject(js);
     } else {
-      if (__DEV__) console.log(`[Userback] queued: ${fn}(${params}) — not ready yet`);
       this._pending.push(js);
     }
   }
