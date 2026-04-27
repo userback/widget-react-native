@@ -153,8 +153,6 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
       const data = JSON.parse(event.nativeEvent.data);
       const type = (data.type ?? data.event ?? '').toLowerCase();
 
-      if (__DEV__) console.log('[Userback] message:', type, data.payload ?? '');
-
       // Mirror iOS SDK: widget_resize with last:true → show, close → hide
       if (type === 'widget_resize' && data.payload?.last === true) setWidgetOpen(true);
       if (type === 'close') setWidgetOpen(false);
