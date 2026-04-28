@@ -7,15 +7,18 @@ Userback feedback widget for React Native, powered by a transparent WebView over
 - React >= 17
 - React Native >= 0.68
 - [`react-native-webview`](https://github.com/react-native-webview/react-native-webview) >= 11
+- [`react-native-view-shot`](https://github.com/gre/react-native-view-shot) >= 3.0
+
+Both are native modules and must be installed in your app alongside this SDK.
 
 ## Installation
 
 ```sh
 # npm
-npm install @userback/react-native-sdk react-native-webview
+npm install @userback/react-native-sdk react-native-webview react-native-view-shot
 
 # yarn
-yarn add @userback/react-native-sdk react-native-webview
+yarn add @userback/react-native-sdk react-native-webview react-native-view-shot
 ```
 
 **iOS** — run pod install after installing:
@@ -24,12 +27,12 @@ yarn add @userback/react-native-sdk react-native-webview
 cd ios && pod install
 ```
 
-**Android** — no extra steps required; `react-native-webview` is auto-linked via Gradle.
+**Android** — no extra steps required; native modules are auto-linked via Gradle.
 
-**Expo** — this SDK uses `react-native-webview` which is a native module. Expo Go is not supported. Use a development build:
+**Expo** — Expo Go is not supported as this SDK uses native modules. Use a development build:
 
 ```sh
-npx expo install expo-dev-client
+npx expo install expo-dev-client react-native-webview react-native-view-shot
 npx expo run:ios     # or run:android
 ```
 
@@ -74,12 +77,25 @@ UserbackSDK.stop();
 | Option | Type | Required | Description |
 |---|---|---|---|
 | `accessToken` | `string` | Yes | Your Userback access token |
-| `userData` | `Record<string, any>` | No | Initial user data passed to the widget |
+| `userData` | `UserbackUserData` | No | Initial user data passed to the widget |
 | `widgetCSS` | `string` | No | Custom CSS injected into the widget |
 | `surveyURL` | `string` | No | Override the survey endpoint URL |
 | `requestURL` | `string` | No | Override the request endpoint URL |
 | `trackURL` | `string` | No | Override the tracking endpoint URL |
 | `widgetJSURL` | `string` | No | Override the widget JS URL (default: `https://static.userback.io/widget/v1.js`) |
+
+`UserbackUserData` shape:
+
+```ts
+{
+  id?: string | number;
+  info?: {
+    name?: string;
+    email?: string;
+    [key: string]: string | number | boolean | undefined;
+  };
+}
+```
 
 ## API
 
@@ -137,11 +153,23 @@ UserbackSDK.stopSessionReplay(): void
 UserbackSDK.addCustomEvent(title: string, details?: Record<string, any>): void
 ```
 
+### Screenshot capture
+
+Screenshots are captured automatically using `react-native-view-shot` when a user attaches a screenshot in the feedback form. To use a custom capture implementation instead:
+
+```ts
+UserbackSDK.screenshotProvider = () => myCustomCapture();
+```
+
 ### Callbacks
 
 ```ts
+UserbackSDK.onClose = () => { ... };
 UserbackSDK.onWidgetConfigLoaded = (config: Record<string, any>) => { ... };
 UserbackSDK.onWidgetResize = (size: { width: number; height: number }) => { ... };
+UserbackSDK.onLoadError = (payload: Record<string, any>) => { ... };
+UserbackSDK.onHcaptchaRequired = (payload: Record<string, any>) => { ... };
+UserbackSDK.onOpenURL = (url: string) => { ... };
 ```
 
 ## Example
