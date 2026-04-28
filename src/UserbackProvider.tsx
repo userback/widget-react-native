@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, PixelRatio, Platform, StyleSheet, View } from 'react-native';
+import { captureScreen } from 'react-native-view-shot';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import { UserbackSDK } from './UserbackSDK';
 import { UserbackConfig } from './types';
@@ -117,13 +118,14 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
 
   useEffect(() => {
     const onScreenshotRequested = async () => {
-      if (!UserbackSDK.screenshotProvider) return;
+      const capture = UserbackSDK.screenshotProvider
+        ?? (() => captureScreen({ format: 'jpg', quality: 0.8, result: 'data-uri' }));
       // Hide the WebView so it's not in the screenshot (mirrors iOS: webView.isHidden = true)
       setTakingScreenshot(true);
       // Wait two frames for the native layer to update before capturing
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       try {
-        const dataURL = await UserbackSDK.screenshotProvider();
+        const dataURL = await capture();
         // Restore the WebView before dispatching so the widget re-renders while visible
         setTakingScreenshot(false);
         UserbackSDK._sendScreenshot(dataURL);

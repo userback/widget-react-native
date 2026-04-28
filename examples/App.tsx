@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { captureScreen } from 'react-native-view-shot';
 import { UserbackProvider, UserbackSDK } from '@userback/react-native-sdk';
 import HomeScreen from './screens/HomeScreen';
 import BasicScreen from './screens/BasicScreen';
@@ -14,9 +13,6 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
 
   useEffect(() => {
-    UserbackSDK.screenshotProvider = () =>
-      captureScreen({ format: 'jpg', quality: 0.8, result: 'data-uri' });
-
     // Start once at the app root — all screens share this instance
     UserbackSDK.start({
         accessToken: 'YOUR_ACCESS_TOKEN',

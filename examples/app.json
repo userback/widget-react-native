@@ -9,7 +9,7 @@
       "android"
     ],
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.userback-sdk-example"
     },
     "android": {
