@@ -1,4 +1,6 @@
 import { UserbackConfig } from './types';
+import { LogObserver } from './LogObserver';
+import { NetworkObserver } from './NetworkObserver';
 
 type Listener = (...args: any[]) => void;
 
@@ -98,6 +100,7 @@ class UserbackSDKClass extends Emitter {
         if (data.payload) {
           this._widgetConfig = data.payload;
           this.onWidgetConfigLoaded?.(data.payload);
+          this._startObservers(data.payload);
         }
         break;
 
@@ -176,6 +179,31 @@ class UserbackSDKClass extends Emitter {
     }
   }
 
+  private _startObservers(config: Record<string, any>): void {
+    const wantsLogs = config.capture_console_log || config.capture_console_error ||
+      config.capture_console_warn || config.capture_console_info || config.capture_console_debug;
+
+    if (wantsLogs) {
+      LogObserver.start(event => this._sendNativeEvent(event));
+    }
+    if (config.capture_network) {
+      NetworkObserver.start(event => this._sendNativeEvent(event));
+    }
+  }
+
+  private _sendNativeEvent(event: Record<string, any>): void {
+    if (!this._inject) return;
+    if (event.type === 'log') {
+      const detail = { payload: { type: event.level, message: event.message } };
+      const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeLogEvent',{detail:${JSON.stringify(detail)}}));})();true;`;
+      this._inject(js);
+    } else {
+      const detail = { payload: event };
+      const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeNetworkEvent',{detail:${JSON.stringify(detail)}}));})();true;`;
+      this._inject(js);
+    }
+  }
+
   /** @internal — called by UserbackProvider after capturing the screenshot */
   _sendScreenshot(dataURL: string): void {
     const message = JSON.stringify({
@@ -206,6 +234,8 @@ class UserbackSDKClass extends Emitter {
   }
 
   stop(): void {
+    LogObserver.stop();
+    NetworkObserver.stop();
     this._config = null;
     this._widgetConfig = null;
     this._ready = false;

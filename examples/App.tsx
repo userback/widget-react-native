@@ -6,8 +6,9 @@ import HomeScreen from './screens/HomeScreen';
 import BasicScreen from './screens/BasicScreen';
 import AuthFlowScreen from './screens/AuthFlowScreen';
 import AdvancedScreen from './screens/AdvancedScreen';
+import ObserversScreen from './screens/ObserversScreen';
 
-export type Screen = 'home' | 'basic' | 'auth' | 'advanced';
+export type Screen = 'home' | 'basic' | 'auth' | 'advanced' | 'observers';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
@@ -35,6 +36,7 @@ export default function App() {
         {screen === 'basic' && <BasicScreen goBack={() => setScreen('home')} />}
         {screen === 'auth' && <AuthFlowScreen goBack={() => setScreen('home')} />}
         {screen === 'advanced' && <AdvancedScreen goBack={() => setScreen('home')} />}
+        {screen === 'observers' && <ObserversScreen goBack={() => setScreen('home')} />}
       </SafeAreaView>
     </UserbackProvider>
   );
