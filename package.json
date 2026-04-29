@@ -27,8 +27,8 @@
     "build": "tsc -p tsconfig.build.json",
     "prepare": "yarn build",
     "typecheck": "tsc --noEmit",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "android": "yarn workspace userback-sdk-example expo run:android",
+    "ios": "yarn workspace userback-sdk-example expo run:ios"
   },
   "peerDependencies": {
     "react": ">=17.0.0",

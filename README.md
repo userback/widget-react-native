@@ -203,3 +203,33 @@ export default function App() {
   );
 }
 ```
+
+## Running the Example App
+
+```sh
+git clone https://github.com/userback/widget-react-native
+cd widget-react-native
+yarn install
+```
+
+**iOS**
+
+```sh
+yarn ios
+```
+
+**Android**
+
+Start an emulator first, then:
+
+```sh
+yarn android
+```
+
+If the build fails with `SDK location not found`, create `examples/android/local.properties`:
+
+```
+sdk.dir=/Users/YOUR_USERNAME/Library/Android/sdk
+```
+
+Replace `YOUR_USERNAME` with your macOS username, or run `echo $HOME` to find the path.
