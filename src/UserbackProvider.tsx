@@ -197,7 +197,6 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
     backgroundColor: 'transparent',
-    ...(__DEV__ && { borderWidth: 2, borderColor: 'red' }),
   },
   webViewHidden: {
     opacity: 0,
