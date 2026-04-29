@@ -10,6 +10,7 @@ const DEMOS: { label: string; screen: Screen; description: string }[] = [
   { screen: 'basic', label: 'Basic Usage', description: 'Open feedback form with a button' },
   { screen: 'auth', label: 'Auth Flow', description: 'Identify user on login, clear on logout' },
   { screen: 'advanced', label: 'Advanced', description: 'Custom trigger, setData, session replay' },
+  { screen: 'observers', label: 'Observers', description: 'Test console log and network capture' },
 ];
 
 export default function HomeScreen({ navigate }: Props) {
