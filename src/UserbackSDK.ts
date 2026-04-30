@@ -36,6 +36,7 @@ class UserbackSDKClass extends Emitter {
   private _ready = false;
   private _pending: string[] = [];
   private _inject: ((js: string) => void) | null = null;
+  private _formOpenTimeout: ReturnType<typeof setTimeout> | null = null;
 
   public onWidgetConfigLoaded?: (config: Record<string, any>) => void;
   public onWidgetResize?: (size: { width: number; height: number }) => void;
@@ -105,6 +106,7 @@ class UserbackSDKClass extends Emitter {
         break;
 
       case 'widget_resize':
+        this._clearFormOpenTimeout();
         this.onWidgetResize?.(data.payload ?? {});
         break;
 
@@ -191,14 +193,21 @@ class UserbackSDKClass extends Emitter {
     }
   }
 
+  private _clearFormOpenTimeout(): void {
+    if (this._formOpenTimeout !== null) {
+      clearTimeout(this._formOpenTimeout);
+      this._formOpenTimeout = null;
+    }
+  }
+
   private _sendNativeEvent(event: Record<string, any>): void {
     if (!this._inject) return;
     if (event.type === 'log') {
-      const detail = { payload: { type: event.level, message: event.message } };
+      const detail = { payload: { type: event.level, message: event.message, mobileSDK: true }, mobileSDK: true };
       const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeLogEvent',{detail:${JSON.stringify(detail)}}));})();true;`;
       this._inject(js);
     } else {
-      const detail = { payload: event };
+      const detail = { payload: { ...event, mobileSDK: true }, mobileSDK: true };
       const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeNetworkEvent',{detail:${JSON.stringify(detail)}}));})();true;`;
       this._inject(js);
     }
@@ -206,11 +215,8 @@ class UserbackSDKClass extends Emitter {
 
   /** @internal — called by UserbackProvider after capturing the screenshot */
   _sendScreenshot(dataURL: string): void {
-    const message = JSON.stringify({
-      type: 'native_screenshot',
-      payload: { data_url: dataURL },
-    });
-    const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeScreenshot',{detail:${message}}));})();true;`;
+    const detail = { type: 'native_screenshot', payload: { data_url: dataURL, mobileSDK: true }, mobileSDK: true };
+    const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeScreenshot',{detail:${JSON.stringify(detail)}}));})();true;`;
     if (this._inject) this._inject(js);
   }
 
@@ -234,6 +240,7 @@ class UserbackSDKClass extends Emitter {
   }
 
   stop(): void {
+    this._clearFormOpenTimeout();
     LogObserver.stop();
     NetworkObserver.stop();
     this._config = null;
@@ -263,7 +270,13 @@ class UserbackSDKClass extends Emitter {
   }
 
   openForm(mode = '', directTo?: string): void {
+    this._clearFormOpenTimeout();
     this._run('openForm', [mode, directTo ?? null]);
+    this._formOpenTimeout = setTimeout(() => {
+      if (__DEV__) console.log('[Userback] openForm timed out — widget did not respond.');
+      this._clearFormOpenTimeout();
+      this.emit('_forceClose');
+    }, 5000);
   }
 
   openPortal(): void { this._run('openPortal'); }

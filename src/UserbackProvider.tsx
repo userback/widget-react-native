@@ -108,11 +108,14 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
   useEffect(() => {
     const onStart = (cfg: UserbackConfig) => setConfig({ ...cfg });
     const onStop = () => setConfig(null);
+    const onForceClose = () => setWidgetOpen(false);
     UserbackSDK.on('_start', onStart);
     UserbackSDK.on('_stop', onStop);
+    UserbackSDK.on('_forceClose', onForceClose);
     return () => {
       UserbackSDK.off('_start', onStart);
       UserbackSDK.off('_stop', onStop);
+      UserbackSDK.off('_forceClose', onForceClose);
     };
   }, []);
 
@@ -141,6 +144,13 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
   const inject = useCallback((js: string) => {
     webViewRef.current?.injectJavaScript(js);
   }, []);
+
+  useEffect(() => {
+    const sub = Dimensions.addEventListener('change', () => {
+      inject(`(function(){window.dispatchEvent(new CustomEvent('userback:rotate'));})();true;`);
+    });
+    return () => sub.remove();
+  }, [inject]);
 
   useEffect(() => {
     if (config) {
