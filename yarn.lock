@@ -2186,7 +2186,6 @@ __metadata:
   resolution: "@userback/react-native-sdk@workspace:."
   dependencies:
     "@types/react": "npm:^18.0.0"
-    expo: "npm:~52.0.49"
     react: "npm:18.3.1"
     react-native: "npm:0.76.9"
     react-native-view-shot: "npm:^3.8.0"
@@ -3816,7 +3815,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:~52.0.0, expo@npm:~52.0.49":
+"expo@npm:~52.0.0":
   version: 52.0.49
   resolution: "expo@npm:52.0.49"
   dependencies:
