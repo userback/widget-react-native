@@ -95,6 +95,55 @@ function buildHTML(config: UserbackConfig): string {
 </html>`;
 }
 
+type SurveyLayoutConfig = {
+  format: string;
+  position: string;
+  size: string;
+  hasOverlay: boolean;
+};
+
+type SurveyInfo = SurveyLayoutConfig & { height: number };
+
+const SURVEY_SPACE = 24;
+
+const SURVEY_SIZE_WIDTHS: Record<string, number> = {
+  'smaller': 352, 'smaller-wide': 448,
+  'small': 448,   'small-wide': 544,
+  'medium': 544,  'medium-wide': 640,
+  'large': 640,   'large-wide': 736,
+  'larger': 736,  'larger-wide': 832,
+  'largest': 1120,
+};
+
+function getSurveyContainerStyle(info: SurveyInfo): object {
+  if (info.hasOverlay) {
+    return StyleSheet.absoluteFillObject;
+  }
+
+  const screen = Dimensions.get('window');
+  const width = Math.min(SURVEY_SIZE_WIDTHS[info.size] ?? 640, screen.width - SURVEY_SPACE * 2);
+  const height = info.height;
+  const centerX = (screen.width - width) / 2;
+  const centerY = (screen.height - height) / 2;
+
+  if (info.format === 'pageless') {
+    return { position: 'absolute' as const, top: 0, left: centerX, width, height: screen.height };
+  }
+
+  switch (info.position) {
+    case 'top':         return { position: 'absolute' as const, top: SURVEY_SPACE, left: centerX, width, height };
+    case 'top_left':    return { position: 'absolute' as const, top: SURVEY_SPACE, left: SURVEY_SPACE, width, height };
+    case 'top_right':   return { position: 'absolute' as const, top: SURVEY_SPACE, right: SURVEY_SPACE, width, height };
+    case 'bottom':      return { position: 'absolute' as const, bottom: SURVEY_SPACE, left: centerX, width, height };
+    case 'bottom_left': return { position: 'absolute' as const, bottom: SURVEY_SPACE, left: SURVEY_SPACE, width, height };
+    case 'bottom_right':return { position: 'absolute' as const, bottom: SURVEY_SPACE, right: SURVEY_SPACE, width, height };
+    case 'left':        return { position: 'absolute' as const, top: centerY, left: SURVEY_SPACE, width, height };
+    case 'right':       return { position: 'absolute' as const, top: centerY, right: SURVEY_SPACE, width, height };
+    case 'center':      return { position: 'absolute' as const, top: centerY, left: centerX, width, height };
+    default:            return StyleSheet.absoluteFillObject;
+  }
+}
+
 interface UserbackProviderProps {
   children: React.ReactNode;
 }
@@ -102,7 +151,9 @@ interface UserbackProviderProps {
 export function UserbackProvider({ children }: UserbackProviderProps) {
   const [config, setConfig] = useState<UserbackConfig | null>(null);
   const [widgetOpen, setWidgetOpen] = useState(false);
+  const [surveyInfo, setSurveyInfo] = useState<SurveyInfo | null>(null);
   const [takingScreenshot, setTakingScreenshot] = useState(false);
+  const surveyConfigsRef = useRef<Record<string, SurveyLayoutConfig>>({});
   const webViewRef = useRef<WebView>(null);
   const pendingFormScreenshotRef = useRef<string | null>(null);
   const formOpenedWithScreenshotRef = useRef(false);
@@ -193,6 +244,7 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
   const handleMessage = useCallback((event: WebViewMessageEvent) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
+
       const type = (data.type ?? data.event ?? '').toLowerCase();
 
       // Mirror iOS SDK: widget_resize with last:true → show, close → hide
@@ -211,6 +263,23 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
       }
       if (type === 'close') setWidgetOpen(false);
 
+      if (type === 'survey_configs' && Array.isArray(data.payload)) {
+        const map: Record<string, SurveyLayoutConfig> = {};
+        for (const cfg of data.payload) {
+          if (cfg.key) map[cfg.key] = { format: cfg.format ?? '', position: cfg.position ?? 'center', size: cfg.size ?? 'large', hasOverlay: !!cfg.has_background_colour };
+        }
+        surveyConfigsRef.current = map;
+      }
+      if (type === 'survey_open') {
+        const cfg = data.payload?.key ? surveyConfigsRef.current[data.payload.key] : undefined;
+        setSurveyInfo(cfg ? { ...cfg, height: 0 } : { format: '', position: 'center', size: 'large', hasOverlay: false, height: 0 });
+      }
+      if (type === 'survey_close') setSurveyInfo(null);
+      if (type === 'survey_height') {
+        const { height } = data.payload ?? {};
+        if (height) setSurveyInfo(prev => prev ? { ...prev, height: height + 40 } : null);
+      }
+
       UserbackSDK._onMessage(data);
     } catch (e) {
       if (__DEV__) console.warn('[Userback] failed to parse message:', e);
@@ -221,14 +290,16 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
   const baseUrl = (() => {
     try { return new URL(widgetJSURL).origin; } catch { return 'https://static.userback.io'; }
   })();
+  console.log('surveyInfo', surveyInfo);
+  console.log(surveyInfo ? getSurveyContainerStyle(surveyInfo) : StyleSheet.absoluteFillObject);
 
   return (
     <>
       {children}
       {config && (
-        <View style={StyleSheet.absoluteFill} pointerEvents={widgetOpen ? 'box-none' : 'none'}>
+        <View style={surveyInfo ? getSurveyContainerStyle(surveyInfo) : StyleSheet.absoluteFillObject} pointerEvents={(widgetOpen || !!surveyInfo) ? 'box-none' : 'none'}>
           <WebView
-            style={[styles.webView, (!widgetOpen || takingScreenshot) && styles.webViewHidden]}
+            style={[styles.webView, (!widgetOpen && !surveyInfo || takingScreenshot) && styles.webViewHidden]}
             ref={webViewRef}
             source={{ html: buildHTML(config), baseUrl }}
             onMessage={handleMessage}
@@ -249,6 +320,8 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
     backgroundColor: 'transparent',
+    borderWidth: 3,
+    borderColor: 'red',
   },
   webViewHidden: {
     opacity: 0,

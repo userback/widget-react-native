@@ -14,12 +14,17 @@ export default function BasicScreen({ goBack }: Props) {
         UserbackProvider and start() live in App.tsx. Any screen can call openForm().
       </Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm()}>
+      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('general')}>
         <Text style={styles.buttonText}>Open Feedback</Text>
       </TouchableOpacity>
 
+<<<<<<< HEAD
       <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('bug', 'screenshot')}>
         <Text style={styles.buttonText}>Open Feedback with Screenshot</Text>
+=======
+      <TouchableOpacity style={[styles.button, styles.surveyButton]} onPress={() => UserbackSDK.openSurvey('Your Userback survey ID')}>
+        <Text style={styles.buttonText}>Open Survey</Text>
+>>>>>>> f0d203d (Add survey support phase 1)
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, styles.secondary]} onPress={goBack}>
@@ -41,6 +46,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  surveyButton: { backgroundColor: '#43A047' },
   secondary: { backgroundColor: 'transparent' },
   secondaryText: { color: '#5C6BC0', fontSize: 16 },
 });

@@ -96,14 +96,16 @@ class UserbackSDKClass extends Emitter {
   _onMessage(data: Record<string, any>): void {
     const type = (data.type ?? data.event ?? '').toLowerCase();
     switch (type) {
-      case 'load':
+      case 'load': {
         this._onReady();
-        if (data.payload) {
-          this._widgetConfig = data.payload;
-          this.onWidgetConfigLoaded?.(data.payload);
-          this._startObservers(data.payload);
+        const feedbackConfig = data.payload?.feedback ?? data.payload;
+        if (feedbackConfig) {
+          this._widgetConfig = feedbackConfig;
+          this.onWidgetConfigLoaded?.(feedbackConfig);
+          this._startObservers(feedbackConfig);
         }
         break;
+      }
 
       case 'widget_resize':
         this._clearFormOpenTimeout();
@@ -289,6 +291,7 @@ class UserbackSDKClass extends Emitter {
   openPortal(): void { this._run('openPortal'); }
   openRoadmap(): void { this._run('openRoadmap'); }
   openAnnouncement(): void { this._run('openAnnouncement'); }
+  openSurvey(surveyKey: string): void { this._run('openSurvey', [surveyKey]); }
   close(): void { this._run('close'); }
 
   setEmail(email: string): void { this._run('setEmail', [email]); }

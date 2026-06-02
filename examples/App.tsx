@@ -16,14 +16,14 @@ export default function App() {
   useEffect(() => {
     // Start once at the app root — all screens share this instance
     UserbackSDK.start({
-        accessToken: 'YOUR_ACCESS_TOKEN',
+        accessToken: 'Your Userback mobile access token',
         userData: {
-          id: 'user-123',
+          id: "123456", // example data
           info: {
-            name: 'Jane Doe',
-            email: 'jane@example.com',
-          },
-        },
+            name: "someone", // example data
+            email: "someone@example.com" // example data
+          }
+        }
     });
     return () => UserbackSDK.stop();
   }, []);
