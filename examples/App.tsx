@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { UserbackProvider, UserbackSDK } from '@userback/react-native-sdk';
@@ -10,8 +10,17 @@ import ObserversScreen from './screens/ObserversScreen';
 
 export type Screen = 'home' | 'basic' | 'auth' | 'advanced' | 'observers';
 
+const SCREEN_NAMES: Record<Screen, string> = {
+  home:      'HomeScreen',
+  basic:     'BasicScreen',
+  auth:      'AuthFlowScreen',
+  advanced:  'AdvancedScreen',
+  observers: 'ObserversScreen',
+};
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
+  const prevScreen = useRef<Screen | null>(null);
 
   useEffect(() => {
     // Start once at the app root — all screens share this instance
@@ -27,6 +36,14 @@ export default function App() {
     });
     return () => UserbackSDK.stop();
   }, []);
+
+  useEffect(() => {
+    if (prevScreen.current) {
+      UserbackSDK.leaveScreen(SCREEN_NAMES[prevScreen.current]);
+    }
+    UserbackSDK.enterScreen(SCREEN_NAMES[screen]);
+    prevScreen.current = screen;
+  }, [screen]);
 
   return (
     <UserbackProvider>

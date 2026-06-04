@@ -294,6 +294,20 @@ class UserbackSDKClass extends Emitter {
   openSurvey(surveyKey: string): void { this._run('openSurvey', [surveyKey]); }
   close(): void { this._run('close'); }
 
+  enterScreen(screenName: string): void {
+    if (__DEV__) console.log(`[Userback] enterScreen: ${screenName}`);
+    const detail = { screenName, action: 'enter' };
+    const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeScreen',{detail:${JSON.stringify(detail)}}));})();true;`;
+    if (this._inject) this._inject(js);
+  }
+
+  leaveScreen(screenName?: string): void {
+    const detail: Record<string, any> = { action: 'leave' };
+    if (screenName) detail.screenName = screenName;
+    const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeScreen',{detail:${JSON.stringify(detail)}}));})();true;`;
+    if (this._inject) this._inject(js);
+  }
+
   setEmail(email: string): void { this._run('setEmail', [email]); }
   setName(name: string): void { this._run('setName', [name]); }
   setCategories(categories: string): void { this._run('setCategories', [categories]); }
