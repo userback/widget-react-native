@@ -271,8 +271,10 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
         surveyConfigsRef.current = map;
       }
       if (type === 'survey_open') {
-        const cfg = data.payload?.key ? surveyConfigsRef.current[data.payload.key] : undefined;
-        setSurveyInfo(cfg ? { ...cfg, height: 0 } : { format: '', position: 'center', size: 'large', hasOverlay: false, height: 0 });
+        if (!widgetOpen) {
+          const cfg = data.payload?.key ? surveyConfigsRef.current[data.payload.key] : undefined;
+          setSurveyInfo(cfg ? { ...cfg, height: 0 } : { format: '', position: 'center', size: 'large', hasOverlay: false, height: 0 });
+        }
       }
       if (type === 'survey_close') setSurveyInfo(null);
       if (type === 'survey_height') {
@@ -290,9 +292,6 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
   const baseUrl = (() => {
     try { return new URL(widgetJSURL).origin; } catch { return 'https://static.userback.io'; }
   })();
-  console.log('surveyInfo', surveyInfo);
-  console.log(surveyInfo ? getSurveyContainerStyle(surveyInfo) : StyleSheet.absoluteFillObject);
-
   return (
     <>
       {children}
@@ -320,8 +319,6 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
     backgroundColor: 'transparent',
-    borderWidth: 3,
-    borderColor: 'red',
   },
   webViewHidden: {
     opacity: 0,

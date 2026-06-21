@@ -25,9 +25,12 @@ export default function App() {
   useEffect(() => {
     // Start once at the app root — all screens share this instance
     UserbackSDK.start({
-        accessToken: 'Your Userback mobile access token',
+        accessToken: 'M-RakmUvgmSu2AY0ZrsoVFRFxdrpa5T1',
+        widgetJSURL: 'https://app.userback.ngrok.dev/dist/widget_dev/widget.min.js?11231',
+        requestURL: 'https://api.userback.ngrok.dev',
+        surveyURL: 'https://app.userback.ngrok.dev/s',
         userData: {
-          id: "123456", // example data
+          id: "123456232352", // example data
           info: {
             name: "someone", // example data
             email: "someone@example.com" // example data
