@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { UserbackSDK } from '@userback/react-native-sdk';
 
@@ -7,6 +7,11 @@ interface Props {
 }
 
 export default function BasicScreen({ goBack }: Props) {
+  useEffect(() => {
+    UserbackSDK.enterScreen('BasicScreen');
+    return () => { UserbackSDK.leaveScreen('BasicScreen'); };
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Basic Usage</Text>

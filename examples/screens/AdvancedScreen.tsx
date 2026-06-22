@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { UserbackSDK } from '@userback/react-native-sdk';
 
@@ -8,6 +8,11 @@ interface Props {
 
 export default function AdvancedScreen({ goBack }: Props) {
   const [replayActive, setReplayActive] = useState(false);
+
+  useEffect(() => {
+    UserbackSDK.enterScreen('AdvancedScreen');
+    return () => { UserbackSDK.leaveScreen('AdvancedScreen'); };
+  }, []);
 
   function toggleReplay() {
     if (replayActive) {
@@ -51,7 +56,7 @@ export default function AdvancedScreen({ goBack }: Props) {
 
       <Text style={styles.sectionLabel}>Attach Metadata</Text>
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, styles.inactive]}
         onPress={() =>
           UserbackSDK.setData({
             screen: 'AdvancedScreen',

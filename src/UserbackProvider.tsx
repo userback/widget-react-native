@@ -318,7 +318,7 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
 const styles = StyleSheet.create({
   webView: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'transparent'
   },
   webViewHidden: {
     opacity: 0,
