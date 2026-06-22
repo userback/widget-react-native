@@ -43,13 +43,13 @@ export default function AdvancedScreen({ goBack }: Props) {
 
       <Text style={styles.sectionLabel}>Multiple Projects</Text>
       <View style={styles.row}>
-        <TouchableOpacity style={styles.chip} onPress={() => UserbackSDK.openForm('FR')}>
+        <TouchableOpacity style={styles.chip} onPress={() => UserbackSDK.openForm('YOUR_PROJECT_KEY_1')}>
           <Text style={styles.chipText}>Project 1</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.chip} onPress={() => UserbackSDK.openForm('PROJ2')}>
+        <TouchableOpacity style={styles.chip} onPress={() => UserbackSDK.openForm('YOUR_PROJECT_KEY_2')}>
           <Text style={styles.chipText}>Project 2</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.chip} onPress={() => UserbackSDK.openForm('VF')}>
+        <TouchableOpacity style={styles.chip} onPress={() => UserbackSDK.openForm('YOUR_PROJECT_KEY_3')}>
           <Text style={styles.chipText}>Project 3</Text>
         </TouchableOpacity>
       </View>

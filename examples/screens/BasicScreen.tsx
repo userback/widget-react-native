@@ -23,13 +23,9 @@ export default function BasicScreen({ goBack }: Props) {
         <Text style={styles.buttonText}>Open Feedback</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('', 'bug', 'screenshot')}>
-        <Text style={styles.buttonText}>Open Feedback with Screenshot</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, styles.surveyButton]} onPress={() => UserbackSDK.openSurvey('NZyc9p')}>
+      <TouchableOpacity style={[styles.button, styles.surveyButton]} onPress={() => UserbackSDK.openSurvey('YOUR_SURVEY_KEY')}>
         <Text style={styles.buttonText}>Open Survey</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>g
 
       <TouchableOpacity style={[styles.button, styles.secondary]} onPress={goBack}>
         <Text style={styles.secondaryText}>← Back</Text>
