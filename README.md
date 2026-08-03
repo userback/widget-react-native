@@ -2,6 +2,26 @@
 
 Userback feedback widget for React Native, powered by a transparent WebView overlay.
 
+## What's new in v2
+
+- **Surveys** — `openSurvey(surveyKey)` opens a specific survey directly.
+- **Screen tracking** — `enterScreen`/`leaveScreen` attribute feedback, surveys, and session replay to the screen the user was on.
+- **Multi-project support** — `openForm` accepts an optional third `projectKey` argument to route feedback to a specific Userback project when your app is set up with more than one.
+
+All of the above are additive. Existing v1 `openForm(mode, directTo)` calls keep working unchanged — no code changes required to upgrade.
+
+### Upgrading from v1
+
+```sh
+# npm
+npm install @userback/react-native-sdk@^2.0.0
+
+# yarn
+yarn add @userback/react-native-sdk@^2.0.0
+```
+
+If you're still passing a general web widget access token (`P-...`) as `accessToken`, switch to your app's **Mobile Key** instead — find it in the Userback app under **Workspace Settings → Mobile SDK**. The Mobile Key is required for screen tracking, native events, and multi-project routing (see [Starting the widget](#starting-the-widget)).
+
 ## Requirements
 
 - React >= 17
@@ -54,13 +74,15 @@ export default function App() {
 
 ## Starting the widget
 
-Call `UserbackSDK.start()` with your access token anywhere in your app. The widget will appear once the WebView is ready.
+Call `UserbackSDK.start()` with your **Mobile Key** anywhere in your app. The widget will appear once the WebView is ready.
+
+Find your Mobile Key in the Userback app under **Workspace Settings → Mobile SDK**. This is a dedicated key for mobile apps — don't use the general web widget access token (`P-...`) here, as it isn't configured for the mobile SDK's screen tracking, native events, or multi-project routing.
 
 ```tsx
 import { UserbackSDK } from '@userback/react-native-sdk';
 
 UserbackSDK.start({
-  accessToken: 'YOUR_ACCESS_TOKEN',
+  accessToken: 'YOUR_MOBILE_KEY',
 });
 ```
 
@@ -76,7 +98,7 @@ UserbackSDK.stop();
 
 | Option | Type | Required | Description |
 |---|---|---|---|
-| `accessToken` | `string` | Yes | Your Userback access token |
+| `accessToken` | `string` | Yes | Your Userback Mobile Key, from Workspace Settings → Mobile SDK in the Userback app |
 | `userData` | `UserbackUserData` | No | Initial user data passed to the widget |
 | `widgetCSS` | `string` | No | Custom CSS injected into the widget |
 | `surveyURL` | `string` | No | Override the survey endpoint URL |
@@ -114,11 +136,33 @@ UserbackSDK.destroy(keepInstance?: boolean, keepRecorder?: boolean): void
 ### Opening/closing the widget
 
 ```ts
-UserbackSDK.openForm(mode?: string, directTo?: string): void
+UserbackSDK.openForm(mode?: string, directTo?: string, projectKey?: string): void
 UserbackSDK.openPortal(): void
 UserbackSDK.openRoadmap(): void
 UserbackSDK.openAnnouncement(): void
+UserbackSDK.openSurvey(surveyKey: string): void
 UserbackSDK.close(): void
+```
+
+- `mode` — feedback type, e.g. `'general'`, `'bug'`, `'feature_request'`. Defaults to your project's configured default.
+- `directTo` — jump straight to a destination, e.g. `'screenshot'` to open the form with a screenshot already attached.
+- `projectKey` — if you've set up multiple Userback projects for this app, pass the target project's key to route the form to that project instead of the default one tied to your `accessToken`. Find a project's key in the Userback dashboard under that project's settings. Leave empty to use the default project.
+- `openSurvey(surveyKey)` — opens a specific survey by its survey key (found in the Userback dashboard under that survey's settings), independent of the feedback form.
+
+### Screen tracking
+
+```ts
+UserbackSDK.enterScreen(screenName: string): void
+UserbackSDK.leaveScreen(screenName?: string): void
+```
+
+Call `enterScreen` when a screen becomes active and `leaveScreen` when it's dismissed, so feedback, surveys, and session replay can be attributed to the correct screen. Typically wired up in a screen component's `useEffect`:
+
+```tsx
+useEffect(() => {
+  UserbackSDK.enterScreen('BasicScreen');
+  return () => { UserbackSDK.leaveScreen('BasicScreen'); };
+}, []);
 ```
 
 ### User identity
@@ -190,7 +234,7 @@ function FeedbackButton() {
 
 export default function App() {
   useEffect(() => {
-    UserbackSDK.start({ accessToken: 'YOUR_ACCESS_TOKEN' });
+    UserbackSDK.start({ accessToken: 'YOUR_MOBILE_KEY' });
     return () => UserbackSDK.stop();
   }, []);
 

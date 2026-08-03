@@ -19,7 +19,7 @@ export default function BasicScreen({ goBack }: Props) {
         UserbackProvider and start() live in App.tsx. Any screen can call openForm().
       </Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('', 'general')}>
+      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('general')}>
         <Text style={styles.buttonText}>Open Feedback</Text>
       </TouchableOpacity>
 

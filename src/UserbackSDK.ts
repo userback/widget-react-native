@@ -271,13 +271,12 @@ class UserbackSDKClass extends Emitter {
     this._run('destroy', [keepInstance, keepRecorder]);
   }
 
-  openForm(projectKey = '', mode = '', directTo?: string): void {
+  openForm(mode = '', directTo?: string, projectKey = ''): void {
     this._clearFormOpenTimeout();
-    this._run('setActiveWidget', [projectKey]);
     // Don't pass 'screenshot' to the widget — native handles it via widget_resize,
     // so the form opens directly to the correct type on both v1 and v2.
     const widgetDirectTo = directTo?.toLowerCase() === 'screenshot' ? null : (directTo ?? null);
-    this._run('openForm', [mode, widgetDirectTo]);
+    this._run('openForm', [mode, widgetDirectTo, projectKey]);
     if (directTo?.toLowerCase() === 'screenshot') {
       this.emit('_captureScreenshotBeforeForm');
     }
