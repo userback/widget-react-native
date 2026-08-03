@@ -18,6 +18,10 @@ export default function BasicScreen({ goBack }: Props) {
         <Text style={styles.buttonText}>Open Feedback</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('bug', 'screenshot')}>
+        <Text style={styles.buttonText}>Open Feedback with Screenshot</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={[styles.button, styles.secondary]} onPress={goBack}>
         <Text style={styles.secondaryText}>← Back</Text>
       </TouchableOpacity>
