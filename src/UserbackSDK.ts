@@ -271,7 +271,14 @@ class UserbackSDKClass extends Emitter {
 
   openForm(mode = '', directTo?: string): void {
     this._clearFormOpenTimeout();
-    this._run('openForm', [mode, directTo ?? null]);
+    // Don't pass 'screenshot' to the widget — native handles it via widget_resize,
+    // so the form opens directly to the correct type on both v1 and v2.
+    const widgetDirectTo = directTo?.toLowerCase() === 'screenshot' ? null : (directTo ?? null);
+    this._run('openForm', [mode, widgetDirectTo]);
+    if (directTo?.toLowerCase() === 'screenshot') {
+      this.emit('_captureScreenshotBeforeForm');
+    }
+
     this._formOpenTimeout = setTimeout(() => {
       if (__DEV__) console.log('[Userback] openForm timed out — widget did not respond.');
       this._clearFormOpenTimeout();

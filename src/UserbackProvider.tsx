@@ -104,6 +104,8 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
   const [widgetOpen, setWidgetOpen] = useState(false);
   const [takingScreenshot, setTakingScreenshot] = useState(false);
   const webViewRef = useRef<WebView>(null);
+  const pendingFormScreenshotRef = useRef<string | null>(null);
+  const formOpenedWithScreenshotRef = useRef(false);
 
   useEffect(() => {
     const onStart = (cfg: UserbackConfig) => setConfig({ ...cfg });
@@ -141,6 +143,34 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
     return () => { UserbackSDK.off('_screenshotRequested', onScreenshotRequested); };
   }, []);
 
+  useEffect(() => {
+    const onCaptureBeforeForm = async () => {
+      pendingFormScreenshotRef.current = null;
+      formOpenedWithScreenshotRef.current = true;
+      const capture = UserbackSDK.screenshotProvider
+        ?? (() => captureScreen({ format: 'jpg', quality: 0.8, result: 'data-uri' }));
+      setTakingScreenshot(true);
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      try {
+        const dataURL = await capture();
+        setTakingScreenshot(false);
+        if (formOpenedWithScreenshotRef.current) {
+          // Form not yet shown — store and send when widget_resize fires
+          pendingFormScreenshotRef.current = dataURL;
+        } else {
+          // Form already shown — send immediately
+          UserbackSDK._sendScreenshot(dataURL);
+        }
+      } catch (e) {
+        if (__DEV__) console.warn('[Userback] pre-form screenshot failed:', e);
+        setTakingScreenshot(false);
+        formOpenedWithScreenshotRef.current = false;
+      }
+    };
+    UserbackSDK.on('_captureScreenshotBeforeForm', onCaptureBeforeForm);
+    return () => { UserbackSDK.off('_captureScreenshotBeforeForm', onCaptureBeforeForm); };
+  }, []);
+
   const inject = useCallback((js: string) => {
     webViewRef.current?.injectJavaScript(js);
   }, []);
@@ -166,7 +196,19 @@ export function UserbackProvider({ children }: UserbackProviderProps) {
       const type = (data.type ?? data.event ?? '').toLowerCase();
 
       // Mirror iOS SDK: widget_resize with last:true → show, close → hide
-      if (type === 'widget_resize' && data.payload?.last === true) setWidgetOpen(true);
+      if (type === 'widget_resize' && data.payload?.last === true) {
+        setWidgetOpen(true);
+        if (formOpenedWithScreenshotRef.current) {
+          formOpenedWithScreenshotRef.current = false;
+          const dataURL = pendingFormScreenshotRef.current;
+          if (dataURL) {
+            pendingFormScreenshotRef.current = null;
+            UserbackSDK._sendScreenshot(dataURL);
+          }
+          // If dataURL is null, capture hasn't finished yet — the onCaptureBeforeForm
+          // handler will send it as soon as capture completes (formOpenedWithScreenshotRef is false).
+        }
+      }
       if (type === 'close') setWidgetOpen(false);
 
       UserbackSDK._onMessage(data);
