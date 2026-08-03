@@ -24,6 +24,6 @@ examples/.expo/
 # OS
 .DS_Store
 
-# CocoaPods (library — do not commit generated files)
-ios/Podfile.lock
-ios/*.xcworkspace/
+# Stray native project accidentally generated at repo root (the real example
+# app lives in examples/ios — this rule is scoped to the root only).
+/ios/
