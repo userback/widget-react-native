@@ -96,14 +96,16 @@ class UserbackSDKClass extends Emitter {
   _onMessage(data: Record<string, any>): void {
     const type = (data.type ?? data.event ?? '').toLowerCase();
     switch (type) {
-      case 'load':
+      case 'load': {
         this._onReady();
-        if (data.payload) {
-          this._widgetConfig = data.payload;
-          this.onWidgetConfigLoaded?.(data.payload);
-          this._startObservers(data.payload);
+        const feedbackConfig = data.payload?.feedback ?? data.payload;
+        if (feedbackConfig) {
+          this._widgetConfig = feedbackConfig;
+          this.onWidgetConfigLoaded?.(feedbackConfig);
+          this._startObservers(feedbackConfig);
         }
         break;
+      }
 
       case 'widget_resize':
         this._clearFormOpenTimeout();
@@ -269,12 +271,12 @@ class UserbackSDKClass extends Emitter {
     this._run('destroy', [keepInstance, keepRecorder]);
   }
 
-  openForm(mode = '', directTo?: string): void {
+  openForm(mode = '', directTo?: string, projectKey = ''): void {
     this._clearFormOpenTimeout();
     // Don't pass 'screenshot' to the widget — native handles it via widget_resize,
     // so the form opens directly to the correct type on both v1 and v2.
     const widgetDirectTo = directTo?.toLowerCase() === 'screenshot' ? null : (directTo ?? null);
-    this._run('openForm', [mode, widgetDirectTo]);
+    this._run('openForm', [mode, widgetDirectTo, projectKey]);
     if (directTo?.toLowerCase() === 'screenshot') {
       this.emit('_captureScreenshotBeforeForm');
     }
@@ -289,6 +291,7 @@ class UserbackSDKClass extends Emitter {
   openPortal(): void { this._run('openPortal'); }
   openRoadmap(): void { this._run('openRoadmap'); }
   openAnnouncement(): void { this._run('openAnnouncement'); }
+  openSurvey(surveyKey: string): void { this._run('openSurvey', [surveyKey]); }
   close(): void { this._run('close'); }
 
   setEmail(email: string): void { this._run('setEmail', [email]); }
@@ -313,6 +316,26 @@ class UserbackSDKClass extends Emitter {
 
   addCustomEvent(title: string, details?: Record<string, any>): void {
     this._run('addCustomEvent', [title, details ?? null]);
+  }
+
+  enterScreen(name: string): void {
+    const detail = { screenName: name, action: 'enter' };
+    const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeScreen',{detail:${JSON.stringify(detail)}}));})();true;`;
+    if (this._ready && this._inject) {
+      this._inject(js);
+    } else {
+      this._pending.push(js);
+    }
+  }
+
+  leaveScreen(name: string): void {
+    const detail = { screenName: name, action: 'leave' };
+    const js = `(function(){window.dispatchEvent(new CustomEvent('userback:nativeScreen',{detail:${JSON.stringify(detail)}}));})();true;`;
+    if (this._ready && this._inject) {
+      this._inject(js);
+    } else {
+      this._pending.push(js);
+    }
   }
 }
 

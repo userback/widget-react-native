@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { UserbackSDK } from '@userback/react-native-sdk';
 
@@ -7,6 +7,11 @@ interface Props {
 }
 
 export default function BasicScreen({ goBack }: Props) {
+  useEffect(() => {
+    UserbackSDK.enterScreen('BasicScreen');
+    return () => { UserbackSDK.leaveScreen('BasicScreen'); };
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Basic Usage</Text>
@@ -14,12 +19,12 @@ export default function BasicScreen({ goBack }: Props) {
         UserbackProvider and start() live in App.tsx. Any screen can call openForm().
       </Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm()}>
+      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('general')}>
         <Text style={styles.buttonText}>Open Feedback</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => UserbackSDK.openForm('bug', 'screenshot')}>
-        <Text style={styles.buttonText}>Open Feedback with Screenshot</Text>
+      <TouchableOpacity style={[styles.button, styles.surveyButton]} onPress={() => UserbackSDK.openSurvey('YOUR_SURVEY_KEY')}>
+        <Text style={styles.buttonText}>Open Survey</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, styles.secondary]} onPress={goBack}>
@@ -41,6 +46,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  surveyButton: { backgroundColor: '#43A047' },
   secondary: { backgroundColor: 'transparent' },
   secondaryText: { color: '#5C6BC0', fontSize: 16 },
 });
