@@ -25,7 +25,7 @@ export default function BasicScreen({ goBack }: Props) {
 
       <TouchableOpacity style={[styles.button, styles.surveyButton]} onPress={() => UserbackSDK.openSurvey('YOUR_SURVEY_KEY')}>
         <Text style={styles.buttonText}>Open Survey</Text>
-      </TouchableOpacity>g
+      </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, styles.secondary]} onPress={goBack}>
         <Text style={styles.secondaryText}>← Back</Text>
