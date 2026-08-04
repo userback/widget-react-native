@@ -1,6 +1,6 @@
 {
   "name": "@userback/react-native-sdk",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "Userback feedback widget SDK for React Native",
   "license": "MIT",
   "keywords": [
