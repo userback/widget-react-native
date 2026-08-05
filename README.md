@@ -5,7 +5,7 @@ Userback feedback widget for React Native, powered by a transparent WebView over
 ## What's new in v2
 
 - **Surveys** — `openSurvey(surveyKey)` opens a specific survey directly.
-- **Screen tracking** — `enterScreen`/`leaveScreen` attribute feedback, surveys, and session replay to the screen the user was on.
+- **Screen tracking** — `enterScreen`/`leaveScreen` attribute surveys to the screen the user was on.
 - **Multi-project support** — `openForm` accepts an optional third `projectKey` argument to route feedback to a specific Userback project when your app is set up with more than one.
 
 All of the above are additive. Existing v1 `openForm(mode, directTo)` calls keep working unchanged — no code changes required to upgrade.
@@ -156,7 +156,7 @@ UserbackSDK.enterScreen(screenName: string): void
 UserbackSDK.leaveScreen(screenName?: string): void
 ```
 
-Call `enterScreen` when a screen becomes active and `leaveScreen` when it's dismissed, so feedback, surveys, and session replay can be attributed to the correct screen. Typically wired up in a screen component's `useEffect`:
+Call `enterScreen` when a screen becomes active and `leaveScreen` when it's dismissed, so surveys can be attributed to the correct screen. Typically wired up in a screen component's `useEffect`:
 
 ```tsx
 useEffect(() => {
