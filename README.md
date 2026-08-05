@@ -156,7 +156,7 @@ UserbackSDK.enterScreen(screenName: string): void
 UserbackSDK.leaveScreen(screenName?: string): void
 ```
 
-Call `enterScreen` when a screen becomes active and `leaveScreen` when it's dismissed, so surveys can be attributed to the correct screen. Typically wired up in a screen component's `useEffect`:
+Call `enterScreen` when a screen becomes active and `leaveScreen` when it's dismissed, so surveys can be attributed to the correct screen. The `screenName` you pass must match a screen configured in the Userback app under **Survey Designer → Target → Mobile Screens** — that's how a survey gets targeted to appear only on specific screens. Typically wired up in a screen component's `useEffect`:
 
 ```tsx
 useEffect(() => {
