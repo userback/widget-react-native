@@ -6,7 +6,7 @@ Userback feedback widget for React Native, powered by a transparent WebView over
 
 - **Surveys** — `openSurvey(surveyKey)` opens a specific survey directly.
 - **Screen tracking** — `enterScreen`/`leaveScreen` attribute surveys to the screen the user was on.
-- **Multi-project support** — `openForm` accepts an optional third `projectKey` argument to route feedback to a specific Userback project when your app is set up with more than one.
+- **Multi-project support** — `openForm` accepts an optional third `projectKey` argument to route feedback to a specific Userback project when your app is set up with more than one. Pass your **site key** (Site Settings → General) — a project's own key still works too, for existing integrations.
 
 All of the above are additive. Existing v1 `openForm(mode, directTo)` calls keep working unchanged — no code changes required to upgrade.
 
@@ -146,7 +146,7 @@ UserbackSDK.close(): void
 
 - `mode` — feedback type, e.g. `'general'`, `'bug'`, `'feature_request'`. Defaults to your project's configured default.
 - `directTo` — jump straight to a destination, e.g. `'screenshot'` to open the form with a screenshot already attached.
-- `projectKey` — if you've set up multiple Userback projects for this app, pass the target project's key to route the form to that project instead of the default one tied to your `accessToken`. Find a project's key in the Userback dashboard under that project's settings. Leave empty to use the default project.
+- `projectKey` — if you've set up multiple Userback projects for this app, pass the target site's key to route the form to that site's feedback project instead of the default one tied to your `accessToken`. Find your site key in the Userback dashboard under **Site Settings → General** (gear icon next to the site in the site switcher). A project's own key still works here too, for existing integrations. Leave empty to use the default project.
 - `openSurvey(surveyKey)` — opens a specific survey by its survey key (found in the Userback dashboard under that survey's settings), independent of the feedback form.
 
 ### Screen tracking
